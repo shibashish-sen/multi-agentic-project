@@ -24,7 +24,7 @@ TripRequest (structured input)
 ```bash
 uv sync                     # or: pip install -e .
 cp .env.example .env        # then fill in your keys
-python orchestrator.py
+uv orchestrator.py
 ```
 
 ## Roadmap: 
