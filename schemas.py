@@ -60,6 +60,26 @@ class ItineraryData(BaseModel):
     attractions: list[Attraction]
     meal_costs: list[MealCostEstimate]
 
+class ItineraryChunk(BaseModel):
+    """A single retrieved chunk — raw text, not parsed attraction/cost
+    data. See ItineraryData above for the eventual structured version
+    once ingestion supports per-attraction cost extraction."""
+    content: str
+    city: str | None = None
+    country: str | None = None
+    region: str | None = None
+    source: str | None = None
+    chunk_index: int | None = None
+
+
+class ItinerarySearchResult(BaseModel):
+    """Result of a pure vector-similarity search — top-k chunks, no
+    generation. Mirrors FlightSearchResult/HotelSearchResult's shape
+    (query + results + optional error)."""
+    query: str
+    results: list[ItineraryChunk] = []
+    error: str | None = None
+
 
 # ── Weather (structured — no more formatted-string returns) ─────────
 

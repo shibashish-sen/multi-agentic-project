@@ -15,6 +15,7 @@ from langchain_openai import ChatOpenAI
 from mcp_client.weather_client import call_weather_tool, call_historical_weather_tool
 from mcp_client.flight_client import call_flight_tool
 from mcp_client.hotel_client import call_hotel_tool
+from mcp_client.rag_client import call_rag_tool
 from airport_lookup import resolve_city, resolve_iata
 from schemas import (
     TripRequest,
@@ -37,14 +38,6 @@ llm = ChatOpenAI(
         "X-Title": "Travel Orchestrator",
     },
 )
-
-
-async def get_itinerary_context(destination: str) -> str:
-    """Placeholder for the RAG lookup (top-3 nearest embeddings from
-    Supabase pgvector). TBD — how this gets consumed (raw chunk vs.
-    LLM-parsed structured Attraction/MealCostEstimate) is still open.
-    """
-    return f"(Itinerary/RAG context for {destination} not wired up yet.)"
 
 
 async def _weather_for_date(location: str, target_date: date):
@@ -104,7 +97,7 @@ async def plan_trip(request: TripRequest) -> dict:
             checkout, request.adults,
         ),
         "weather_departure": _weather_for_date(destination_city, request.departure_date),
-        "itinerary": get_itinerary_context(destination_city),
+        "itinerary": call_rag_tool(f"things to do, attractions, food in {destination_city}"),
     }
     if request.return_date:
         task_map["weather_return"] = _weather_for_date(destination_city, request.return_date)
@@ -137,7 +130,7 @@ async def summarize(request: TripRequest, results: dict) -> str:
     ]
     if results.get("weather_return"):
         parts.append(f"\nWeather (return):\n{results['weather_return'].model_dump_json(indent=2)}")
-    parts.append(f"\nItinerary context:\n{results.get('itinerary', '')}")
+    parts.append(f"\nItinerary context:\n{results['itinerary'].model_dump_json(indent=2) if results.get('itinerary') else 'unavailable'}")
     parts.append(f"\nCost estimate (already computed — report these numbers exactly, do not recalculate):\n{results['cost_estimate'].format()}")
 
     prompt = (
@@ -146,7 +139,11 @@ async def summarize(request: TripRequest, results: dict) -> str:
         "cheapest) so the user can compare price ranges — do not omit any. "
         "Use the cost numbers exactly as given — do not recompute them. Note "
         "clearly which weather figures are real forecasts vs. historical "
-        "averages.\n\n" + "\n".join(parts)
+        "averages. Include a 'Things to Do' section synthesized from the "
+        "itinerary context chunks below — cover attractions, food, and "
+        "budget tips relevant to the destination. If itinerary context is "
+        "unavailable or has no results, omit that section rather than "
+        "inventing content.\n\n" + "\n".join(parts)
     )
 
     response = await llm.ainvoke(prompt)
