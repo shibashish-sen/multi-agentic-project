@@ -111,4 +111,4 @@ Planned direction for v2, using LangGraph (already a dependency):
 
 ## 🧰 Tech Stack
 
-Python · LangGraph · MCP · LLMs · RAG · FAISS · Pydantic · FastAPI · Docker
+Python · LangGraph · MCP · LLMs · RAG · Supabase · Pydantic · FastAPI 
