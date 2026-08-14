@@ -96,7 +96,7 @@ uv orchestrator.py
 
 ## 📸 Example
 
-Mumbai <-> New Delhi · Aug 15–20, 2026
+Mumbai <-> New Delhi · Aug 15–20, 2026 · Budget trip
 
 ![Demo](data/output/travel_example.gif)
 
