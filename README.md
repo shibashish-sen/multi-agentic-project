@@ -94,6 +94,13 @@ cp .env.example .env        # then fill in your keys
 uv orchestrator.py
 ```
 
+## 📸 Example
+
+Mumbai → New Delhi · Aug 15–20, 2026
+
+![Demo](data/output/travel_example.gif)
+
+
 ## Roadmap: 
 
 Planned direction for v2, using LangGraph (already a dependency):
@@ -102,6 +109,6 @@ Planned direction for v2, using LangGraph (already a dependency):
 - **Human-in-the-loop checkpoint** — surface the plan for approval/edits to have A2A communication and optimize budget according to user needs
 
 
-🧰 Tech Stack
+## 🧰 Tech Stack
 
 Python · LangGraph · MCP · LLMs · RAG · FAISS · Pydantic · FastAPI · Docker
